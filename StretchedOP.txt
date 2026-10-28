@@ -1,0 +1,89 @@
+-- Carrega a biblioteca de UI (Rayfield)
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- Configuração Global da Resolução
+getgenv().Resolution = { [".gg/scripters"] = 0.5625 }
+getgenv().gg_scripters = "Aori0001"
+getgenv().ResolutionEnabled = true
+
+local Camera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+
+-- Função para iniciar a conexão da CFrame
+local function ApplyResolution()
+    if getgenv().ResolutionConnection then
+        getgenv().ResolutionConnection:Disconnect()
+    end
+
+    getgenv().ResolutionConnection = RunService.RenderStepped:Connect(function()
+        if getgenv().ResolutionEnabled then
+            Camera.CFrame = Camera.CFrame * CFrame.new(0, 0, 0, 1, 0, 0, 0, getgenv().Resolution[".gg/scripters"], 0, 0, 0, 1)
+        end
+    end)
+end
+
+-- Aplica o efeito ao executar o script
+ApplyResolution()
+
+-- Criação da Janela do Menu
+local Window = Rayfield:CreateWindow({
+   Name = "Resolution Changer | .gg/scripters",
+   LoadingTitle = "Carregando Menu...",
+   LoadingSubtitle = "por " .. getgenv().gg_scripters,
+   ConfigurationSaving = {
+      Enabled = false,
+   },
+   KeySystem = false
+})
+
+-- Aba Principal
+local MainTab = Window:CreateTab("Configuração", 4483362458) -- Ícone padrão
+
+MainTab:CreateSection("Ajuste de Tela / Stretch")
+
+-- Toggle para Ativar ou Desativar o efeito
+MainTab:CreateToggle({
+   Name = "Ativar Estiramento de Tela",
+   CurrentValue = true,
+   Flag = "ResolutionToggle",
+   Callback = function(Value)
+      getgenv().ResolutionEnabled = Value
+   end,
+})
+
+-- Slider para aumentar e diminuir a densidade/estiramento
+-- Nota: Valores menores deixam a tela mais esticada/esticamento no eito Y
+MainTab:CreateSlider({
+   Name = "Densidade / Resolução (Y)",
+   Range = {0.10, 2.00},
+   Increment = 0.0025,
+   Suffix = "x",
+   CurrentValue = getgenv().Resolution[".gg/scripters"],
+   Flag = "ResolutionSlider",
+   Callback = function(Value)
+      getgenv().Resolution[".gg/scripters"] = Value
+   end,
+})
+
+-- Botão de Reset
+MainTab:CreateButton({
+   Name = "Resetar Tela (Padrão 1.0)",
+   Callback = function()
+      getgenv().Resolution[".gg/scripters"] = 1
+      -- Atualiza a interface visualmente se necessário
+      Rayfield:Notify({
+         Title = "Resolução Resetada",
+         Content = "A escala de tela foi definida para 1.0 (Padrão).",
+         Duration = 3,
+         Image = 4483362458,
+      })
+   end,
+})
+
+-- Notificação Inicial
+Rayfield:Notify({
+   Title = "Menu Carregado!",
+   Content = "Script ativado com sucesso.",
+   Duration = 4,
+   Image = 4483362458,
+})
